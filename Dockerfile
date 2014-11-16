@@ -18,7 +18,7 @@ RUN cp /usr/lib/syslinux/menu.c32 /tftpboot
 RUN cp /usr/lib/syslinux/pxelinux.0 /tftpboot
 RUN chmod -R 700 /tftpboot/
 RUN chown -R nobody:nogroup /tftpboot/
-RUN chmod -R 755 /run.sh
+RUN chmod 755 /run.sh
 
 CMD /run.sh
 EXPOSE 69/udp
