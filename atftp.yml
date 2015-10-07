@@ -1,0 +1,29 @@
+- name: Configure and Build iPXE
+  gather_facts: false
+  hosts: all
+  vars:
+    syslinux_files:
+      - /usr/lib/syslinux/menu.c32
+      - /usr/lib/syslinux/pxelinux.0
+    pkgs:
+      - syslinux
+      - atftpd
+  tasks:
+    - name: Dependency to build iPXE
+      command: apt-get -y install {{ item }}
+      with_items: pkgs
+
+    - name: Create pxelinux.cfg directory
+      file:
+        path: /tftpboot/pxelinux.cfg/
+        state: directory
+        owner: nobody
+        group: nogroup
+    - name: Copy syslinux files to tftpboot
+      copy:
+        src: "{{ item }}"
+        dest: /tftpboot/
+        owner: nobody
+        group: nogroup
+        mode: 0700
+      with_items: syslinux_files

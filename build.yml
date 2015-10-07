@@ -1,0 +1,77 @@
+- name: Configure and Build iPXE
+  gather_facts: false
+  hosts: all
+  vars:
+    ipxe_files:
+      - /home/ipxe/src/bin/ipxe.lkrn
+      - /home/ipxe/src/bin/ipxe.pxe
+      - /home/ipxe/src/bin/undionly.kpxe
+    pkgs:
+      - git
+      - make
+      - build-essential
+      - genisoimage
+      - mkisofs
+      - liblzma-dev
+  tasks:
+    - name: Dependency to build iPXE
+      command: apt-get -y install {{ item }}
+      with_items: pkgs
+    - name: Clone iPXE
+      git:
+        repo: git://git.ipxe.org/ipxe.git
+        dest: /home/ipxe
+    - name: Configure (uncomment) Console PC BIOS Usage All
+      lineinfile:
+        dest: /home/ipxe/src/config/defaults.h
+        regexp: "//#define.*CONSOLE_PCBIOS.*"
+        line: "#define\tCONSOLE_PCBIOS CONSOLE_USAGE_ALL"
+        state: present
+    - name: Configure (uncomment) Console Syslog Usage All
+      lineinfile:
+        dest: /home/ipxe/src/config/defaults.h
+        regexp: "//#define.*CONSOLE_SYSLOG.*"
+        line: "#define\tCONSOLE_SYSLOG\tCONSOLE_USAGE_ALL"
+        state: present
+    - name: Remove define for Console PC BIOS
+      lineinfile:
+        dest: /home/ipxe/src/config/defaults/pcbios.h
+        regexp: "#define.*CONSOLE_PCBIOS.*"
+        state: absent
+    - name: Configure (uncomment) IPSTAT Command
+      lineinfile:
+        dest: /home/ipxe/src/config/general.h
+        regexp: "//#define.*IPSTAT_CMD.*"
+        line: "#define\tIPSTAT_CMD"
+        state: absent
+    - name: Configure (uncomment) PROFSTAT Command
+      lineinfile:
+        dest: /home/ipxe/src/config/general.h
+        regexp: "//#define.*PROFSTAT_CMD.*"
+        line: "#define\tPROFSTAT_CMD"
+        state: absent
+    - name: Build iPXE with debug options
+      command: 'make -j2 DEBUG=httpcore:3,monojob:3,pxe_image:3,intel:0 chdir=/home/ipxe/src'
+    - name: Create tftpboot directory
+      file:
+        path: /tftpboot/
+        state: directory
+        owner: nobody
+        group: nogroup
+    - name: Copy iPXE files to tftpboot
+      copy:
+        src: "{{ item }}"
+        dest: /tftpboot/
+        owner: nobody
+        group: nogroup
+        mode: 0700
+      with_items: ipxe_files
+    - name: Remove all iPXE source files
+      file:
+        path: /home/ipxe/
+        state: absent
+    - name: Remove all unneeded packages
+      command: apt-get -y remove {{ item }}
+      with_items: pkgs
+    - name: Autoremove all packages
+      command: apt-get -y autoremove
