@@ -14,11 +14,8 @@ RUN apt-get -y update \
     && apt-get -y remove ansible \
     && apt-get -y autoremove \
     && apt-get clean \
-    && rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/*
-
-COPY default /tftpboot/pxelinux.cfg/
-
-RUN chmod -R 700 /tftpboot/ \
+    && rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/* \
+    && chmod -R 700 /tftpboot/ \
     && chown -R nobody:nogroup /tftpboot/ \
     && chmod 755 /run.sh
 
