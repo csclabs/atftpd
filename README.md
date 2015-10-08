@@ -10,4 +10,4 @@ Clone the repo.
 
 Create a local docker image.
 
-`docker build -t jcpowermac/atftpd .`
+`docker build -t cscdock/atftpd .`
