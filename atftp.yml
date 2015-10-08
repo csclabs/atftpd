@@ -9,6 +9,10 @@
       - syslinux
       - atftpd
   tasks:
+# Normally I would _always_ use a module vs a command
+# Since we are doing this inside a container and didn't
+# want to install additional dependencies I am using command
+# instead.
     - name: Dependency to build iPXE
       command: apt-get -y install {{ item }}
       with_items: pkgs
