@@ -23,6 +23,7 @@
         state: directory
         owner: nobody
         group: nogroup
+    
     - name: Copy syslinux files to tftpboot
       copy:
         src: "{{ item }}"

@@ -11,7 +11,7 @@ RUN apt-get -y update \
     && apt-get -y install ansible wget \
     && /usr/bin/ansible-playbook -c local -i localhost, /build.yml \
     && /usr/bin/ansible-playbook -c local -i localhost, /atftp.yml \
-    && apt-get -y remove ansible \
+    && apt-get -y purge ansible \
     && apt-get -y autoremove \
     && apt-get clean \
     && rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/* \
